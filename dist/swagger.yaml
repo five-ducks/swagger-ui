@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: Gaming Tournament API
+  description: API for managing users, matches, tournaments, and friendships in a gaming platform.
+  version: 1.0.0
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/SihaLee/TEST/1.0.0
+  - url: https://api.gamingplatform.com/v1
+    description: Main API server
+
+paths:
+  /user:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        description: User to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+      tags:
+        - User
+  
+  /user/login:
+    get:
+      summary: Logs user into the system
+      operationId: loginUser
+      parameters:
+        - name: user_login_id
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: user_login_password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+        '401':
+          description: "Invalid login ID or password."
+          headers:
+            X-Rate-Limit:
+              description: "Number of calls per hour allowed by the user."
+              schema:
+                type: integer
+                format: int32
+      tags:
+        - User
+        
+  /user/logout:
+    get:
+      summary: "User logout"
+      description: "Endpoint to log out a user and invalidate the session."
+      operationId: logoutUser
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/AuthToken'
+      responses:
+        '200':
+          description: "Successful logout."
+          headers:
+            X-Rate-Limit:
+              description: "Number of calls per hour allowed by the user."
+              schema:
+                type: integer
+                format: int32
+        '401':
+          description: "Invalid or expired token."
+          headers:
+            X-Rate-Limit:
+              description: "Number of calls per hour allowed by the user."
+              schema:
+                type: integer
+                format: int32
+      tags:
+        - User
+          
+  /user/{user_login_id}:
+    get:
+      summary: Get user by user name
+      operationId: getUserById
+      parameters:
+        - name: user_login_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      tags:
+        - User
+
+    put:
+      summary: Update a user
+      operationId: updateUser
+      parameters:
+        - name: user_login_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: User data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+      tags:
+        - User
+
+    delete:
+      summary: Delete a user
+      operationId: deleteUser
+      parameters:
+        - name: user_login_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted successfully
+      tags:
+        - User
+
+  /match:
+
+    post:
+      summary: Create a new match
+      operationId: createMatch
+      requestBody:
+        description: Match to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Match'
+      responses:
+        '201':
+          description: Match created successfully
+      tags:
+        - Match
+
+  /match/{match_id}:
+    get:
+      summary: Retrieve a specific match
+      operationId: getMatchById
+      parameters:
+        - name: match_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Match details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+      tags:
+        - Match
+
+    put:
+      summary: Update a match
+      operationId: updateMatch
+      parameters:
+        - name: match_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Match data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Match'
+      responses:
+        '200':
+          description: Match updated successfully
+      tags:
+        - Match
+
+    delete:
+      summary: Delete a match
+      operationId: deleteMatch
+      parameters:
+        - name: match_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Match deleted successfully
+      tags:
+        - Match
+
+  /tournament:
+
+    post:
+      summary: Create a new tournament
+      operationId: createTournament
+      requestBody:
+        description: Tournament to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+      responses:
+        '201':
+          description: Tournament created successfully
+      tags:
+        - Tournament
+
+  /tournament/{tournament_id}:
+    get:
+      summary: Retrieve a specific tournament
+      operationId: getTournamentById
+      parameters:
+        - name: tournament_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tournament details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+      tags:
+        - Tournament
+
+    put:
+      summary: Update a tournament
+      operationId: updateTournament
+      parameters:
+        - name: tournament_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Tournament data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+      responses:
+        '200':
+          description: Tournament updated successfully
+      tags:
+        - Tournament
+
+    delete:
+      summary: Delete a tournament
+      operationId: deleteTournament
+      parameters:
+        - name: tournament_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Tournament deleted successfully
+      tags:
+        - Tournament
+
+  /friend:
+    get:
+      summary: Retrieve a list of friends
+      operationId: getFriends
+      responses:
+        '200':
+          description: A list of friends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Friend'
+      tags:
+        - Friend
+
+    post:
+      summary: Add a new friend
+      operationId: createFriend
+      requestBody:
+        description: Friend to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Friend'
+      responses:
+        '201':
+          description: Friend added successfully
+      tags:
+        - Friend
+
+  /friend/{user_id}/{friend_user_id}:
+    delete:
+      summary: Remove a friend
+      operationId: deleteFriend
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: friend_user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Friend removed successfully
+      tags:
+        - Friend
+
+components:
+  schemas:
+
+
+    AuthToken:
+      type: string
+      description: "Authentication token required for logout."
+      
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          description: "Unique identifier for the user."
+        profile_image_id:
+          type: string
+          format: uuid
+          description: "UUID representing the user's profile image."
+        user_login_id:
+          type: string
+          format: string
+          description: "Username used as the login ID for the user."
+        user_login_password:
+          type: string
+          format: password
+          description: "Password for the user login."
+        user_profile_nickname:
+          type: string
+          format: string
+          description: "Nickname for the user."
+        user_macrotext1:
+          type: string
+          format: string
+          example: 'good game'
+        user_macrotext2:
+          type: string
+          format: string
+          example: 'thanks'
+        user_macrotext3:
+          type: string
+          format: string
+          example: 'bye bye'
+        user_macrotext4:
+          type: string
+          format: string
+          example: 'gooooood!'
+        user_macrotext5:
+          type: string
+          format: string
+          example: 'hello'
+      required:
+        - user_id
+        - profile_image_id
+        - user_login_id
+        - user_login_password
+        - user_profile_nickname
+
+    Match:
+      type: object
+      properties:
+        match_id:
+          type: integer
+          format: int64
+          description: "Unique identifier for the match."
+        user_id:
+          type: integer
+          format: int64
+          description: "Identifier for the user."
+        match_rival_id:
+          type: integer
+          format: int64
+          description: "Identifier for the rival user."
+        match_result:
+          type: string
+          enum: [win, lose]
+          format: string
+          description: "Result of the match."
+        match_start_time:
+          type: string
+          format: date-time
+          description: "Start time of the match."
+        match_end_time:
+          type: string
+          format: date-time
+          description: "End time of the match."
+        match_user_grade:
+          type: integer
+          format: int32
+          description: "Grade of the user in the match."
+        match_rival_grade:
+          type: integer
+          format: int32
+          description: "Grade of the rival user in the match."
+        match_type:
+          type: string
+          enum: [single, tournament]
+          format: string
+          description: "Type of match."
+      required:
+        - match_id
+        - user_id
+        - match_rival_id
+        - match_start_time
+        - match_type
+
+    Tournament:
+      type: object
+      properties:
+        tournament_id:
+          type: integer
+          format: int64
+          description: "Unique identifier for the tournament."
+        semifinal_id1:
+          type: integer
+          format: int64
+          description: "Identifier for the first semifinal match."
+        semifinal_id2:
+          type: integer
+          format: int64
+          description: "Identifier for the second semifinal match."
+        bonus_match_id:
+          type: integer
+          format: int64
+          description: "Identifier for the bonus match."
+        final_id:
+          type: integer
+          format: int64
+          description: "Identifier for the final match."
+      required:
+        - tournament_id
+
+    Friend:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          description: "Identifier for the user."
+        friend_user_id:
+          type: integer
+          format: int64
+          description: "Identifier for the friend user."
+        friend_relation:
+          type: string
+          enum: [pending, accepted, blocked]
+          format: string
+          description: "Relation status with the friend."
+        profile_image_id:
+          type: string
+          format: uuid
+          description: "UUID representing the friend's profile image."
+      required:
+        - user_id
+        - friend_user_id
+        - friend_relation
